@@ -36,7 +36,7 @@ for categoria in professor sala turma; do
     for f in *.pdf; do
         pdftotext -layout $f
         titulo=$(head -1 ${f%.pdf}.txt | sed 's/^ *//;s/ *$//;s/^Professor //')
-	      slug=$(slugify $titulo)
+	      slug=$(echo $titulo | slugify)
         echo "${slug}:${titulo}" >> index.csv
 	      mv -v $f ${slug}.pdf
         mv -v ${f%.pdf}.txt ${slug}.txt
