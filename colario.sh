@@ -37,25 +37,25 @@ for categoria in professor sala turma; do
         pdftotext -layout $f
         titulo=$(head -1 ${f%.pdf}.txt | sed 's/^ *//;s/ *$//;s/^Professor //')
 	      slug=$(slugify $titulo)
-        echo "${slug}:${titulo}" > index.csv
+        echo "${slug}:${titulo}" >> index.csv
 	      mv -v $f ${slug}.pdf
         mv -v ${f%.pdf}.txt ${slug}.txt
 	
         inkscape \
               --without-gui \
               --file=${slug}.pdf \
-              --export-plain-svg=${slug}.svg
+              --export-plain-svg=${slug}.svg  2> /dev/null
         
         cp ${slug}.svg -v ../rst/_static/img/${categoria}/
         cp ${slug}.pdf -v ../dropbox/${categoria}/
 
         RST_DIR="../rst/${categoria}/${slug}/"
         mkdir -vp $RST_DIR
+        titulo_decorado=$(decorar "${titulo}" "=")
         cat << EOF >> ${RST_DIR}/index.rst
 .. _${slug}:
 
-${titulo}
-===========
+${titulo_decorado}
 
 .. figure:: ../../_static/img/${categoria}/${slug}.svg
    :alt: ${titulo}
@@ -112,10 +112,10 @@ Laboratórios e salas
 
 EOF
 
-      for p in $labturma; do
-        idxlab=rst/sala/${p}/index.rst
-        echo "* :doc:\`/sala/${p}/index\`" >> $idxturma
-        echo "* :doc:\`/turma/${slug}/index\`" >> $idxlab
+      for s in $labturma; do
+        idxlab=rst/sala/${s}/index.rst
+        echo "* :ref:\`${s}\`" | tee -a $idxturma
+        echo "* :ref:\`${slug}\`" | tee -a $idxlab
       done
     done
 }
@@ -134,8 +134,8 @@ EOF
 
       for p in $profturma; do
         idxprof=rst/professor/${p}/index.rst
-        echo "* :doc:\`/professor/${p}/index\`" >> $idxturma
-        echo "* :doc:\`/turma/${slug}/index\`" >> $idxprof
+        echo "* :ref:\`${p}\`" | tee -a $idxturma
+        echo "* :ref:\`${slug}\`" | tee -a $idxprof
       done
     done
 }
