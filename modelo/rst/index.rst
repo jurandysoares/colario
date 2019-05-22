@@ -12,7 +12,5 @@ Horário IFRN/PAR 2019.1
    Professores <professor/index.rst>
    Salas <sala/index.rst>
    Turmas <turma/index.rst>
-
-
-
+   Setores <setor/index.rst>
 
