@@ -1,6 +1,10 @@
 #!/bin/bash
 
-campus=$(basename $PWD)
+if [[ $# -ne 1 ]]; then
+	return 1
+fi
+
+campus=$1
 # Maneira melhor de carregar os dados do horário
 #source <(grep = horario/horario.ini)
 # Fonte: https://stackoverflow.com/questions/6318809/how-do-i-grab-an-ini-value-within-a-shell-script
@@ -20,7 +24,7 @@ $decorador
 EOF
 }
 
-principal(){
+atualiza_horario(){
 
 for categoria in professor sala turma; do
     
@@ -102,13 +106,18 @@ gerar_html
 
 map_lab_turma(){
     # Mapeamento de laboratórios e salas para turmas
-    cat turma/index.csv | while IFS=: read slug id _; do 
-      labturma=$(cd rst/_static/img/sala/; grep -l $id *.svg | sed 's/\.svg$//');
+    cat turma/index.csv | while IFS=: read slug id; do
+
+      # https://stackoverflow.com/questions/1473981/how-to-check-if-a-string-has-spaces-in-bash-shell
+      if [[ "$id" =~ \  ]]; then
+	      break;
+      fi
+      labturma=$(cd sala/; grep -liw $id *.txt | sed 's/\.txt$//');
       idxturma=rst/turma/${slug}/index.rst
       cat << EOF >> $idxturma
 
-Laboratórios e salas
---------------------
+Labs. e salas desta turma
+--------------------------
 
 EOF
 
@@ -122,13 +131,19 @@ EOF
 
 map_prof_turma() {
     # Mapeamento de professores para turmas
-    cat turma/index.csv | while IFS=: read slug id _; do 
-      profturma=$(cd rst/_static/img/professor/; grep -l $id *.svg | sed 's/\.svg$//');
+    cat turma/index.csv | while IFS=: read slug id; do
+
+      # https://stackoverflow.com/questions/1473981/how-to-check-if-a-string-has-spaces-in-bash-shell
+      if [[ "$id" =~ \  ]]; then
+	      break;
+      fi
+ 
+      profturma=$(cd professor/; grep -liw $id *.txt | sed 's/\.txt$//');
       idxturma=rst/turma/${slug}/index.rst
       cat << EOF >> $idxturma
 
-Professores
------------
+Professores desta turma
+-----------------------
 
 EOF
 
@@ -143,10 +158,29 @@ EOF
 gerar_html(){
   # Gerar páginas HTML e limpar links para "index.html"
   cd rst
+  . /home/jurandy/esfinge/bin/activate
   make clean
   make html
   find _build/html/ -name index.html | xargs sed -i 's@/index.html@/@'
   cd -
+}
+
+principal(){
+   	cd /var/lib/colario/${campus} || exit
+	cd horario || exit
+	git pull
+	MOD_TURMA=$(stat -c%Y turma.pdf)
+	MOD_SALA=$(stat -c%Y sala.pdf)
+	MOD_PROFESSOR=$(stat -c%Y professor.pdf)
+	MOD_INDEX=$(stat -c%Y /var/www/html/horario/${campus}/index.html)
+	cd -
+
+	if [ "$MOD_INDEX" -lt "$MOD_TURMA" -o  "$MOD_INDEX" -lt "$MOD_SALA" -o "$MOD_INDEX" -lt "$MOD_PROFESSOR" ]; then
+		  atualiza_horario
+		  DATAHORA=$(date +'%Y-%m-%d-%H-%M')
+		  mv /var/www/html/horario/${campus}{,-até-${DATAHORA}}
+		  mv rst/_build/html /var/www/html/horario/${campus}
+	fi
 }
 
 principal
