@@ -40,9 +40,15 @@ for categoria in professor sala turma; do
     for f in *.pdf; do
         pdftotext -layout $f
         titulo=$(head -1 ${f%.pdf}.txt | sed 's/^ *//;s/ *$//;s/^Professor //')
-	      slug=$(echo $titulo | slugify)
+	SIGLA_ARQ="../sigla/${categoria}.csv"
+	if [ -f "${SIGLA_ARQ}" ]; then
+		sigla=$(awk -F, -v titulo="$titulo" '$1 == titulo {print $2}' ${SIGLA_ARQ})
+		slug=$(echo $sigla | slugify)
+	else
+        	slug=$(echo $titulo | slugify)
+	fi
         echo "${slug}:${titulo}" >> index.csv
-	      mv -v $f ${slug}.pdf
+        mv -v $f ${slug}.pdf
         mv -v ${f%.pdf}.txt ${slug}.txt
 	
         inkscape \
@@ -108,11 +114,7 @@ map_lab_turma(){
     # Mapeamento de laboratórios e salas para turmas
     cat turma/index.csv | while IFS=: read slug id; do
 
-      # https://stackoverflow.com/questions/1473981/how-to-check-if-a-string-has-spaces-in-bash-shell
-      if [[ "$id" =~ \  ]]; then
-	      break;
-      fi
-      labturma=$(cd sala/; grep -liw $id *.txt | sed 's/\.txt$//');
+      labturma=$(cd sala/; grep -liw $slug *.txt | sed 's/\.txt$//');
       idxturma=rst/turma/${slug}/index.rst
       cat << EOF >> $idxturma
 
@@ -133,12 +135,7 @@ map_prof_turma() {
     # Mapeamento de professores para turmas
     cat turma/index.csv | while IFS=: read slug id; do
 
-      # https://stackoverflow.com/questions/1473981/how-to-check-if-a-string-has-spaces-in-bash-shell
-      if [[ "$id" =~ \  ]]; then
-	      break;
-      fi
- 
-      profturma=$(cd professor/; grep -liw $id *.txt | sed 's/\.txt$//');
+      profturma=$(cd professor/; grep -liw $slug *.txt | sed 's/\.txt$//');
       idxturma=rst/turma/${slug}/index.rst
       cat << EOF >> $idxturma
 
