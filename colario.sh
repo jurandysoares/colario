@@ -119,6 +119,7 @@ done
 
 map_prof_turma
 map_lab_turma
+map_prof_sala
 gerar_html
 
 }
@@ -165,6 +166,37 @@ EOF
       done
     done
 }
+
+map_prof_sala() {
+
+   for prof in rst/professor/*/index.rst; do
+	cat << EOF >> $prof
+
+Salas e labs.
+-------------
+
+EOF
+done
+   # Mapeamento de professores para salas e laboratórios
+   cat sala/index.csv | while IFS=: read slug id; do
+
+   profsala=$(cd professor/; grep -liw $slug *.txt | sed 's/\.txt$//');
+   idxsala=rst/sala/${slug}/index.rst
+   cat << EOF >> $idxsala
+
+Professores
+-----------
+
+EOF
+
+   for s in $profsala; do
+       idxprof=rst/professor/${s}/index.rst
+       echo "* :ref:\`${s}\`" | tee -a $idxsala
+       echo "* :ref:\`${slug}\`" | tee -a $idxprof
+   done
+done
+}
+
 
 gerar_html(){
   # Gerar páginas HTML e limpar links para "index.html"
