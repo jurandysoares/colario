@@ -40,9 +40,9 @@ for categoria in professor sala turma; do
     for f in *.pdf; do
         pdftotext -layout $f
         titulo=$(head -1 ${f%.pdf}.txt | sed 's/^ *//;s/ *$//;s/^Professor //')
-	SIGLA_ARQ="../sigla/${categoria}.csv"
+	SIGLA_ARQ="../horario/sigla/${categoria}.csv"
 	if [ -f "${SIGLA_ARQ}" ]; then
-		sigla=$(awk -F, -v titulo="$titulo" '$1 == titulo {print $2}' ${SIGLA_ARQ})
+		sigla=$(awk -F',' -v titulo="$titulo" '$1 == titulo {print $2}' ${SIGLA_ARQ})
 		slug=$(echo $sigla | slugify)
 	else
         	slug=$(echo $titulo | slugify)
@@ -72,6 +72,20 @@ ${titulo_decorado}
 
 
 EOF
+
+# Camadas
+#if [ -d ../camadas/${categoria} ]; then
+#  cd ../camadas/${categoria}
+#  for c in *.md; 
+#     do
+#       titulo_camada=?
+#       declare -A CAMADA
+#       eval "CAMADA=( $(tail -n +4 ${f} | awk -F'|' '{print "["$2"]="$3}') )"
+#       echo '`'${titulo} '<'${CAMADA[$titulo]}'>_`'
+#     done
+#  cd -
+#
+#  fi
 
 if [[ $categoria =~ ^(professor|sala)$ ]]; then
   cat << EOF >> ${RST_DIR}/index.rst
