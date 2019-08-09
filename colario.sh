@@ -73,6 +73,28 @@ ${titulo_decorado}
 
 EOF
 
+reservar_salas_labs(){
+	categoria=sala
+	texto=$(head -1 camadas/${categoria}/reservas.md | sed 's/^# //')
+	tail -n +2 horario/sigla/${categoria}.csv | while IFS=, read titulo sigla; do
+		link=$(awk -F'|' -v titulo="$titulo" '($2==titulo){print $3}' camadas/${categoria}/reservas.md)
+		slug=$(awk -F':' -v titulo="$titulo" '($2==titulo){print $1}' ${categoria}/index.csv)
+		index="rst/${categoria}/${slug}/index.rst"
+		if [ ! -z "$link" ]; then
+
+		   cat << EOF >> ${index}
+
+Suap
+----
+\`Fazer reserva no SUAP <${link}>\`_.
+
+EOF
+		fi
+	done
+
+}
+
+
 # Camadas
 #if [ -d ../camadas/${categoria} ]; then
 #  cd ../camadas/${categoria}
@@ -120,6 +142,7 @@ done
 map_prof_turma
 map_lab_turma
 map_prof_sala
+reservar_salas_labs
 gerar_html
 
 }
