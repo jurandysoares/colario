@@ -37,13 +37,19 @@ for categoria in professor sala turma; do
 
     pdfseparate ${categoria}.pdf ${categoria}/${categoria}-%d.pdf
     cd ${categoria}
+    SIGLA_ARQ="../horario/sigla/${categoria}.csv"
+
     for f in *.pdf; do
         pdftotext -layout $f
         titulo=$(head -1 ${f%.pdf}.txt | sed 's/^ *//;s/ *$//;s/^Professor //')
-	SIGLA_ARQ="../horario/sigla/${categoria}.csv"
+
 	if [ -f "${SIGLA_ARQ}" ]; then
 		sigla=$(awk -F',' -v titulo="$titulo" '$1 == titulo {print $2}' ${SIGLA_ARQ})
-		slug=$(echo $sigla | slugify)
+		if [ ! -z "$sigla" ]; then
+		    slug=${sigla,,}
+		else
+        	    slug=$(echo $titulo | slugify)
+		fi
 	else
         	slug=$(echo $titulo | slugify)
 	fi
