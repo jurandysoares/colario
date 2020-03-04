@@ -40,8 +40,8 @@ for categoria in professor sala turma; do
     SIGLA_ARQ="../horario/sigla/${categoria}.csv"
 
     for f in *.pdf; do
-        pdftotext -layout $f
-        titulo=$(head -1 ${f%.pdf}.txt | sed 's/^ *//;s/ *$//;s/^Professor //')
+        pdftotext $f
+        titulo=$(head -1 ${f%.pdf}.txt | xargs | sed 's/^Professor //')
 
 	if [ -f "${SIGLA_ARQ}" ]; then
 		sigla=$(awk -F',' -v titulo="$titulo" '$1 == titulo {print $2}' ${SIGLA_ARQ})
