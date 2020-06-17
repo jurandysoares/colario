@@ -1,12 +1,5 @@
-from recommonmark.parser import CommonMarkParser
-source_parsers = {
-    '.md': CommonMarkParser,
-}
-source_suffix = ['.rst', '.md']
-import sys
-import os
 extensions = [
-    'sphinx.ext.mathjax',
+    'recommonmark',
 ]
 templates_path = ['_templates']
 master_doc = 'index'
@@ -31,17 +24,16 @@ latex_documents = [
     (master_doc, 'Horario-{SIGLA_INSTITUICAO}-{SIGLA_CAMPUS}-{ANO}-{PERIODO}.tex', 'Horário {SIGLA_INSTITUICAO}/{SIGLA_CAMPUS} {ANO}.{PERIODO}',
      'Jurandy Soares', 'manual'),
 ]
-man_pages = [
-    (master_doc, 'Horario-{SIGLA_INSTITUICAO}-{SIGLA_CAMPUS}-{ANO}-{PERIODO}', 'Horário {SIGLA_INSTITUICAO}/{SIGLA_CAMPUS} {ANO}.{PERIODO}',
-     [author], 1)
-]
-texinfo_documents = [
-    (master_doc, 'Horario-{SIGLA_INSTITUICAO}-{SIGLA_CAMPUS}-{ANO}-{PERIODO}', 'Horário {SIGLA_INSTITUICAO}/{SIGLA_CAMPUS} {ANO}.{PERIODO}',
-     author, 'Horario-{SIGLA_INSTITUICAO}-{SIGLA_CAMPUS}-{ANO}-{PERIODO}', 'Horário {SIGLA_INSTITUICAO}/{SIGLA_CAMPUS} {ANO}.{PERIODO}.',
-     'Miscellaneous'),
-]
 epub_title = project
 epub_author = author
 epub_publisher = author
 epub_copyright = copyright
 epub_exclude_files = ['search.html']
+
+html_context = {
+        'display_gitlab': True,
+        'theme_vcs_pageview_mode': 'edit/master',
+        'gitlab_host': 'gitlab.devops.ifrn.edu.br',
+        'gitlab_user': 'coapac.{SIGLA_CAMPUS}',
+        'gitlab_repo': 'obs-horario',
+        }
