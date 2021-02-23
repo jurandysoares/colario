@@ -1,0 +1,19 @@
+# Exemplo de configuração de horário
+# A fazer: interpretar este arquivo e alterar os arquivos <conf.py> e <index.rst>.
+#
+instituicao:
+  - nome: Instituto Federal do Rio Grande do Norte
+  - sigla: IFRN
+  - campus:
+    - nome: Natal-Cidade Alta
+    - sigla: CAL
+  - diretoria:
+    - nome: Diretoria Acadêmica
+    - sigla: DIAC
+  - semestre:
+    - ano: 2019
+    - periodo: 1
+
+validade:
+  - ini: 29/04/2019
+  - fim: 05/07/2019
